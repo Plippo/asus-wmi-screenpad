@@ -29,6 +29,7 @@ To install and use this module using dkms:
    sudo dkms build -m asus-wmi -v 1.0
    sudo dkms install -m asus-wmi -v 1.0
    ```
+   From now on, DKMS will automatically rebuild the module on every kernel update.
 
 5. After rebooting, you should now find a new device in `/sys/class/leds/asus::screenpad`.
    To set the brightness of the screen, simply call
