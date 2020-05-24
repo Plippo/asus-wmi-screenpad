@@ -1,5 +1,5 @@
 # asus-wmi-screenpad
-This repository contains a version of the asus-wmi module with support for brightness control on secondary screens ("ScreenPad Plus" on ASUS Zenbook Duo notebooks.
+This repository contains a version of the asus-wmi module with support for brightness control on secondary screens ("ScreenPad Plus") on ASUS Zenbook Duo notebooks.
 
 To install and use this module using dkms:
 
