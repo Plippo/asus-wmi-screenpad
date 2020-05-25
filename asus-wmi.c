@@ -31,6 +31,7 @@
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
 #include <linux/platform_data/x86/asus-wmi.h>
+#include "inc/asus-wmi.h"
 #include <linux/platform_device.h>
 #include <linux/thermal.h>
 #include <linux/acpi.h>
@@ -166,10 +167,13 @@ struct asus_wmi {
 	int kbd_led_wk;
 	struct led_classdev lightbar_led;
 	int lightbar_led_wk;
+	struct led_classdev screenpad_led;
+	int screenpad_led_wk;
 	struct workqueue_struct *led_workqueue;
 	struct work_struct tpd_led_work;
 	struct work_struct wlan_led_work;
 	struct work_struct lightbar_led_work;
+	struct work_struct screenpad_led_work;
 
 	struct asus_rfkill wlan;
 	struct asus_rfkill bluetooth;
@@ -581,6 +585,74 @@ static int lightbar_led_presence(struct asus_wmi *asus)
 	return result & ASUS_WMI_DSTS_PRESENCE_BIT;
 }
 
+static int screenpad_led_read(struct asus_wmi *asus, int *level)
+{
+	int value, retval;
+	retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD, &value);
+	if (retval == 0 && (value & 0x1) == 0x1)
+	{
+		// screen is activated, so read backlight
+		retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD_LIGHT, &value);
+		if (retval == 0)
+		{
+			*level = value & ASUS_WMI_DSTS_BRIGHTNESS_MASK;
+		}
+	}
+	else
+	{
+		*level = 0;
+	}
+
+	if (retval < 0)
+		return retval;
+	return 0;
+}
+
+static void screenpad_led_update(struct work_struct *work)
+{
+	struct asus_wmi *asus;
+	int ctrl_param;
+
+	asus = container_of(work, struct asus_wmi, screenpad_led_work);
+
+	ctrl_param = asus->screenpad_led_wk;
+	if (ctrl_param == 0x00)
+	{
+		// turn off screen
+		asus_wmi_set_devstate(ASUS_WMI_DEVID_SCREENPAD, ctrl_param, NULL);
+	}
+	else
+	{
+		// set backlight (also turns on screen if is off)
+		asus_wmi_set_devstate(ASUS_WMI_DEVID_SCREENPAD_LIGHT, ctrl_param, NULL);
+	}
+}
+
+static void screenpad_led_set(struct led_classdev *led_cdev,
+			     enum led_brightness value)
+{
+	struct asus_wmi *asus;
+
+	asus = container_of(led_cdev, struct asus_wmi, screenpad_led);
+
+	asus->screenpad_led_wk = value;
+	queue_work(asus->led_workqueue, &asus->screenpad_led_work);
+}
+
+static enum led_brightness screenpad_led_get(struct led_classdev *led_cdev)
+{
+	struct asus_wmi *asus;
+	int retval, value;
+
+	asus = container_of(led_cdev, struct asus_wmi, screenpad_led);
+
+	retval = screenpad_led_read(asus, &value);
+	if (retval < 0)
+		return retval;
+
+	return value;
+}
+
 static void asus_wmi_led_exit(struct asus_wmi *asus)
 {
 	if (!IS_ERR_OR_NULL(asus->kbd_led.dev))
@@ -591,6 +663,8 @@ static void asus_wmi_led_exit(struct asus_wmi *asus)
 		led_classdev_unregister(&asus->wlan_led);
 	if (!IS_ERR_OR_NULL(asus->lightbar_led.dev))
 		led_classdev_unregister(&asus->lightbar_led);
+	if (!IS_ERR_OR_NULL(asus->screenpad_led.dev))
+		led_classdev_unregister(&asus->screenpad_led);
 	if (asus->led_workqueue)
 		destroy_workqueue(asus->led_workqueue);
 }
@@ -658,6 +732,20 @@ static int asus_wmi_led_init(struct asus_wmi *asus)
 
 		rv = led_classdev_register(&asus->platform_device->dev,
 					   &asus->lightbar_led);
+	}
+	
+	if (asus_wmi_dev_is_present(asus, ASUS_WMI_DEVID_SCREENPAD)
+		&& !screenpad_led_read(asus, &led_val)) {
+		asus->screenpad_led_wk = led_val;
+		INIT_WORK(&asus->screenpad_led_work, screenpad_led_update);
+
+		asus->screenpad_led.name = "asus::screenpad";
+		asus->screenpad_led.brightness_set = screenpad_led_set;
+		asus->screenpad_led.brightness_get = screenpad_led_get;
+		asus->screenpad_led.max_brightness = 0xff;
+
+		rv = led_classdev_register(&asus->platform_device->dev,
+					   &asus->screenpad_led);
 	}
 
 error:
