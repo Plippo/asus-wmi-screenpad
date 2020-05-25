@@ -585,6 +585,15 @@ static int lightbar_led_presence(struct asus_wmi *asus)
 	return result & ASUS_WMI_DSTS_PRESENCE_BIT;
 }
 
+static int screenpad_led_presence(struct asus_wmi *asus)
+{
+	u32 result;
+
+	asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD, &result);
+
+	return result & ASUS_WMI_DSTS_PRESENCE_BIT;
+}
+
 static int screenpad_led_read(struct asus_wmi *asus, int *level)
 {
 	int value, retval;
@@ -734,7 +743,7 @@ static int asus_wmi_led_init(struct asus_wmi *asus)
 					   &asus->lightbar_led);
 	}
 	
-	if (asus_wmi_dev_is_present(asus, ASUS_WMI_DEVID_SCREENPAD)
+	if (screenpad_led_presence(asus)
 		&& !screenpad_led_read(asus, &led_val)) {
 		asus->screenpad_led_wk = led_val;
 		INIT_WORK(&asus->screenpad_led_work, screenpad_led_update);
