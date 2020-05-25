@@ -14,7 +14,7 @@ To install and use this module using dkms:
    sudo unzip 5.3.zip
    sudo mv asus-wmi-screenpad-5.3/* .
    sudo rmdir asus-wmi-screenpad-5.3
-   sudo rm master.zip
+   sudo rm 5.3.zip
    ```
    Now the source code should be in `/usr/src/asus-wmi-1.0`. It's important that the folder is called exactly like that because DKMS expects that.
    Alternatively you can of course also clone this git repository into that folder.
