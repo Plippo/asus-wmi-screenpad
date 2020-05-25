@@ -10,11 +10,11 @@ To install and use this module using dkms:
    ```
    sudo mkdir /usr/src/asus-wmi-1.0
    cd /usr/src/asus-wmi-1.0
-   sudo wget 'https://github.com/Plippo/asus-wmi-screenpad/archive/master.zip'
-   sudo unzip master.zip
-   sudo mv asus-wmi-screenpad-master/* .
-   sudo rmdir asus-wmi-screenpad-master
-   sudo rm master.zip
+   sudo wget 'https://github.com/Plippo/asus-wmi-screenpad/archive/backlight.zip'
+   sudo unzip backlight.zip
+   sudo mv asus-wmi-screenpad-backlight/* .
+   sudo rmdir asus-wmi-screenpad-backlight
+   sudo rm backlight.zip
    ```
    Now the source code should be in `/usr/src/asus-wmi-1.0`. It's important that the folder is called exactly like that because DKMS expects that.
    Alternatively you can of course also clone this git repository into that folder.
