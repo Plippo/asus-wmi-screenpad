@@ -1995,7 +1995,7 @@ static void asus_wmi_screenpad_backlight_init(struct asus_wmi *asus)
 	memset(&props, 0, sizeof(struct backlight_properties));
 	props.type = BACKLIGHT_PLATFORM;
 	props.max_brightness = max;
-	bd = backlight_device_register("screenpad",
+	bd = backlight_device_register("asus_screenpad",
 				       &asus->platform_device->dev, asus,
 				       &asus_wmi_screenpad_bl_ops, &props);
 	if (IS_ERR(bd)) {
