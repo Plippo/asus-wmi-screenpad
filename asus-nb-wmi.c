@@ -478,7 +478,7 @@ static const struct key_entry asus_nb_wmi_keymap[] = {
 	{ KE_KEY, 0x7E, { KEY_BLUETOOTH } }, /* Bluetooth Disable */
 	{ KE_KEY, 0x82, { KEY_CAMERA } },
 	{ KE_KEY, 0x85, { KEY_CAMERA } },
-	{ KE_KEY, 0x86, { KEY_F15 } }, /* Key containing "A" logo */
+	{ KE_KEY, 0x86, { KEY_F13 } }, /* Key containing "A" logo */
 	{ KE_KEY, 0x88, { KEY_RFKILL  } }, /* Radio Toggle Key */
 	{ KE_KEY, 0x8A, { KEY_PROG1 } }, /* Color enhancement mode */
 	{ KE_KEY, 0x8C, { KEY_SWITCHVIDEOMODE } }, /* SDSP DVI only */
@@ -491,7 +491,8 @@ static const struct key_entry asus_nb_wmi_keymap[] = {
 	{ KE_KEY, 0x93, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV + DVI */
 	{ KE_KEY, 0x95, { KEY_MEDIA } },
 	{ KE_KEY, 0x99, { KEY_PHONE } }, /* Conflicts with fan mode switch */
-	{ KE_KEY, 0x9C, { KEY_CYCLEWINDOWS } }, /* Zenbook Duo Swap Windows */
+	{ KE_KEY, 0x9C, { KEY_F15 } }, /* Zenbook Duo Swap Windows */
+	{ KE_KEY, 0x9D, { KEY_F14 } }, /* Zenbook Duo Power mode */
 	{ KE_KEY, 0xA0, { KEY_SWITCHVIDEOMODE } }, /* SDSP HDMI only */
 	{ KE_KEY, 0xA1, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + HDMI */
 	{ KE_KEY, 0xA2, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + HDMI */

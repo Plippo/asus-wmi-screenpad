@@ -48,3 +48,11 @@ To install and use this module using dkms:
    `chmod` has to be executed again after every reboot, so it is advisable to add the call to a boot script, e.g. `/etc/rc.local`.
    
 6. You can now also use the functionality of your Desktop Environment to map the function keys on the keyboard to actions of your choice. For example, you can create a script that toggles the state of the screenpad and map it to the "Toggle ScreenPad" key.
+
+### Removing or reinstalling
+If you want to re-download and reinstall the kernel module (maybe because there have been changes in the code), you have to remove the old one first, calling
+```
+sudo dkms remove -m asus-wmi -v 1.0 --all
+sudo rm -r /usr/src/asus-wmi-1.0
+```
+Then repeat the steps above from step 2 on.
