@@ -3,8 +3,12 @@ This repository contains a version of the asus-wmi module with support for brigh
 
 To install and use this module using dkms:
 
+0. Please make sure that you are running the kernel that you want to install the module for. So if you did a kernel update, please reboot first so the installation uses the correct kernel version.
+
 1. Install DKMS using the method of your distribution.
-   Debian: `sudo apt install dkms`
+   Debian/Ubuntu/etc.: `sudo apt install dkms`
+   In addition to that, you need to have the headers for your current kernels installed. Most distributions provide a package for that.
+   E.g. Ubuntu: `sudo apt install linux-headers-5.4.0-37` (replace by the correct version as determined by `uname -r`)
    
 2. Create a directory for the module and download the source code
    ```
