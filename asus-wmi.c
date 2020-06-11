@@ -1938,6 +1938,7 @@ static int screenpad_update_bl_status(struct backlight_device *bd)
 		else 
 		{
 			// Turn brightness off
+			power = bd->props.power;
 			err = asus_wmi_set_devstate(ASUS_WMI_DEVID_SCREENPAD, power, NULL);		
 		}	
 
