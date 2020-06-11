@@ -1,31 +1,32 @@
 diff -up orig/asus-nb-wmi.c new/asus-nb-wmi.c
 --- orig/asus-nb-wmi.c	2020-05-25 15:53:47.368526000 +0200
 +++ new/asus-nb-wmi.c	2020-05-25 15:52:14.137043000 +0200
-@@ -469,6 +469,7 @@ static const struct key_entry asus_nb_wm
- 	{ KE_KEY, 0x65, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + TV */
- 	{ KE_KEY, 0x66, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + TV */
- 	{ KE_KEY, 0x67, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV */
+@@ -469,6 +469,7 @@ static const struct key_entry asus_nb_wmi_keymap[] = {
+	{ KE_KEY, 0x65, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + TV */
+	{ KE_KEY, 0x66, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + TV */
+	{ KE_KEY, 0x67, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV */
 +	{ KE_KEY, 0x6A, { KEY_F16 } }, /* Toggle ScreenPad key */
- 	{ KE_KEY, 0x6B, { KEY_TOUCHPAD_TOGGLE } },
- 	{ KE_IGNORE, 0x6E, },  /* Low Battery notification */
- 	{ KE_KEY, 0x7a, { KEY_ALS_TOGGLE } }, /* Ambient Light Sensor Toggle */
-@@ -476,6 +477,8 @@ static const struct key_entry asus_nb_wm
- 	{ KE_KEY, 0x7D, { KEY_BLUETOOTH } }, /* Bluetooth Enable */
- 	{ KE_KEY, 0x7E, { KEY_BLUETOOTH } }, /* Bluetooth Disable */
- 	{ KE_KEY, 0x82, { KEY_CAMERA } },
+	{ KE_KEY, 0x6B, { KEY_TOUCHPAD_TOGGLE } },
+	{ KE_IGNORE, 0x6E, },  /* Low Battery notification */
+	{ KE_KEY, 0x7a, { KEY_ALS_TOGGLE } }, /* Ambient Light Sensor Toggle */
+@@ -476,6 +477,8 @@ static const struct key_entry asus_nb_wmi_keymap[] = {
+	{ KE_KEY, 0x7D, { KEY_BLUETOOTH } }, /* Bluetooth Enable */
+	{ KE_KEY, 0x7E, { KEY_BLUETOOTH } }, /* Bluetooth Disable */
+	{ KE_KEY, 0x82, { KEY_CAMERA } },
 +	{ KE_KEY, 0x85, { KEY_CAMERA } },
-+	{ KE_KEY, 0x86, { KEY_F15 } }, /* Key containing "A" logo */
- 	{ KE_KEY, 0x88, { KEY_RFKILL  } }, /* Radio Toggle Key */
- 	{ KE_KEY, 0x8A, { KEY_PROG1 } }, /* Color enhancement mode */
- 	{ KE_KEY, 0x8C, { KEY_SWITCHVIDEOMODE } }, /* SDSP DVI only */
-@@ -488,6 +491,7 @@ static const struct key_entry asus_nb_wm
- 	{ KE_KEY, 0x93, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV + DVI */
- 	{ KE_KEY, 0x95, { KEY_MEDIA } },
- 	{ KE_KEY, 0x99, { KEY_PHONE } }, /* Conflicts with fan mode switch */
-+	{ KE_KEY, 0x9C, { KEY_CYCLEWINDOWS } }, /* Zenbook Duo Swap Windows */
- 	{ KE_KEY, 0xA0, { KEY_SWITCHVIDEOMODE } }, /* SDSP HDMI only */
- 	{ KE_KEY, 0xA1, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + HDMI */
- 	{ KE_KEY, 0xA2, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + HDMI */
++	{ KE_KEY, 0x86, { KEY_F13 } }, /* Key containing "A" logo */
+	{ KE_KEY, 0x88, { KEY_RFKILL  } }, /* Radio Toggle Key */
+	{ KE_KEY, 0x8A, { KEY_PROG1 } }, /* Color enhancement mode */
+	{ KE_KEY, 0x8C, { KEY_SWITCHVIDEOMODE } }, /* SDSP DVI only */
+@@ -488,6 +491,8 @@ static const struct key_entry asus_nb_wmi_keymap[] = {
+	{ KE_KEY, 0x93, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV + DVI */
+	{ KE_KEY, 0x95, { KEY_MEDIA } },
+	{ KE_KEY, 0x99, { KEY_PHONE } }, /* Conflicts with fan mode switch */
++	{ KE_KEY, 0x9C, { KEY_F15 } }, /* Zenbook Duo Swap Windows */
++	{ KE_KEY, 0x9D, { KEY_F14 } }, /* Zenbook Duo Power mode */
+	{ KE_KEY, 0xA0, { KEY_SWITCHVIDEOMODE } }, /* SDSP HDMI only */
+	{ KE_KEY, 0xA1, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + HDMI */
+	{ KE_KEY, 0xA2, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + HDMI */
 diff -up orig/asus-wmi.c new/asus-wmi.c
 --- orig/asus-wmi.c	2020-05-25 15:53:24.136871000 +0200
 +++ new/asus-wmi.c	2020-05-25 15:52:14.141040000 +0200
