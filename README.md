@@ -56,7 +56,7 @@ To install and use this module using dkms:
    ```
 
    `chmod` has to be executed again after every reboot, so it is advisable to add the call to a boot script, e.g. `/etc/rc.local`.  
-   or create a udev rule set the permissions:  
+   or create a udev rule to set the permissions:  
    `sudo nano /etc/udev/rules.d/99-asus.rules`
    ```
     # rules for asus_nb_wmi devices
