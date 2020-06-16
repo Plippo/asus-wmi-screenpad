@@ -9,7 +9,7 @@ To install and use this module using dkms:
    Debian/Ubuntu/etc.: `sudo apt install dkms`
    In addition to that, you need to have the headers for your current kernels installed. Most distributions provide a package for that.
    E.g. Ubuntu: `sudo apt install linux-headers-5.4.0-37` (replace by the correct version as determined by `uname -r`)
-   
+
 2. Create a directory for the module and download the source code
    ```
    sudo mkdir /usr/src/asus-wmi-1.0
@@ -45,7 +45,7 @@ To install and use this module using dkms:
    ```
    echo XXX | sudo tee '/sys/class/leds/asus::screenpad/brightness'
    ```
-   where XXX is a value between 0 and 255 (0 turns the screen completely off, 255 sets it to maximum brightness.
+   where XXX is a value between 0 and 255 (0 turns the screen completely off, 255 sets it to maximum brightness.  
    To allow every user to set the brightness without using sudo, call
    ```
    sudo chmod a+w '/sys/class/leds/asus::screenpad/brightness'
@@ -54,9 +54,24 @@ To install and use this module using dkms:
    ```
    echo XXX > '/sys/class/leds/asus::screenpad/brightness'
    ```
+
    `chmod` has to be executed again after every reboot, so it is advisable to add the call to a boot script, e.g. `/etc/rc.local`.
-   
-7. You can now also use the functionality of your Desktop Environment to map the function keys on the keyboard to actions of your choice. For example, you can create a script that toggles the state of the screenpad and map it to the "Toggle ScreenPad" key.
+   or create a udev rule set the permissions:  
+   `sudo nano /etc/udev/rules.d/99-asus.rules`
+   ```
+    # rules for asus_nb_wmi devices
+
+    # make screenpad backlight brightness write-able by everyone
+    ACTION=="add", SUBSYSTEM=="leds", KERNEL=="asus::screenpad", RUN+="/bin/chmod a+w /sys/class/leds/%k/brightness"
+   ```
+   <!--
+   # make lightbar write-able by everyone
+   ACTION=="add", SUBSYSTEM=="leds", KERNEL=="asus::lightbar", RUN+="/bin/chmod a+w /sys/class/leds/%k/brightness"
+    -->
+
+
+7. You can now also use the functionality of your Desktop Environment to map the function keys on the keyboard to actions of your choice.
+   For example, you can create a script that toggles the state of the screenpad and map it to the "Toggle ScreenPad" key.
 
 ### Removing or reinstalling
 If you want to re-download and reinstall the kernel module (maybe because there have been changes in the code), you have to remove the old one first, calling
