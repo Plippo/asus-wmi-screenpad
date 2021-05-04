@@ -80,3 +80,6 @@ sudo dkms remove -m asus-wmi -v 1.0 --all
 sudo rm -r /usr/src/asus-wmi-1.0
 ```
 Then repeat the steps above from step 2 on.
+
+### Major kernel updates
+After a major kernel update (e.g. from 5.8 to 5.10), DKMS cannot update the module automatically as the new kernel sources need to be downloaded and patched. In this case, please uninstall and reinstall the module as described above under *Removing or reinstalling*.
