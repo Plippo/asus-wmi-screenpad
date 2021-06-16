@@ -1,7 +1,7 @@
 #!/bin/sh
 VERSION=`uname -r | grep -o '^[0-9]\+\.[0-9]\+'`
 
-if { echo $VERSION ; echo "5.7" ; } | sort -n -c 2>/dev/null
+if { echo $VERSION ; echo "5.7" ; } | sort -V -c 2>/dev/null
 then
   PATCHFILE="patch"
 else
