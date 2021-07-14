@@ -37,6 +37,7 @@ To install and use this module using dkms:
    ```
    sudo dkms build -m asus-wmi -v 1.0
    sudo dkms install -m asus-wmi -v 1.0
+   sudo depmod -a
    ```
    From now on, DKMS will automatically rebuild the module on every kernel update.
 
