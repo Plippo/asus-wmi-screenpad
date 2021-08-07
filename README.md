@@ -37,7 +37,6 @@ To install and use this module using dkms:
    ```
    sudo dkms build -m asus-wmi -v 1.0
    sudo dkms install -m asus-wmi -v 1.0
-   sudo depmod -a
    ```
    From now on, DKMS will automatically rebuild the module on every kernel update.
 
@@ -58,6 +57,18 @@ To install and use this module using dkms:
    `chmod` has to be executed again after every reboot, so it is advisable to add the call to a boot script, e.g. `/etc/rc.local`.
    
 7. You can now also use the functionality of your Desktop Environment to map the function keys on the keyboard to actions of your choice. For example, you can create a script that toggles the state of the screenpad and map it to the "Toggle ScreenPad" key.
+
+8. Some Kernel(like 5.8 and 5.11) maybe already have the asus-wmi driver. So, we have replace it.
+```bash
+cd /lib/modules/YOURKERNELVERSION/kernel/drivers/platform/x86
+sudo mv  asus-nb-wmi.ko asus-nb-wmi.ko_bak
+sudo mv asus-wmi.ko asus-wmi.ko_bak
+sudo ln -s ../../../../extra/asus-nb-wmi.ko ./
+sudo ln -s ../../../../extra/asus-wmi.ko ./
+sudo depmod -a
+```
+
+
 
 ### Removing or reinstalling
 If you want to re-download and reinstall the kernel module (maybe because there have been changes in the code), you have to remove the old one first, calling
