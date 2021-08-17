@@ -58,7 +58,11 @@ To install and use this module using dkms:
    
 7. You can now also use the functionality of your Desktop Environment to map the function keys on the keyboard to actions of your choice. For example, you can create a script that toggles the state of the screenpad and map it to the "Toggle ScreenPad" key.
 
-8. Some Kernel(like 5.8 and 5.11) maybe already have the asus-wmi driver. So, we have replace it.
+
+
+### Troubleshooting
+On some kernels, it might happen that the built-in module overrides our compiled module.
+In this case, it might help to execute the following code afterwards:
 ```bash
 cd /lib/modules/YOURKERNELVERSION/kernel/drivers/platform/x86
 sudo mv  asus-nb-wmi.ko asus-nb-wmi.ko_bak
