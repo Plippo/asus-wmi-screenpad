@@ -75,6 +75,14 @@ To install and use this module using dkms:
 
 
 
+### Tools to control the ScreenPad
+|Name|Description|Additional notes|
+|-|-|-|
+|[asus-screenpad-control](https://github.com/lakinduakash/asus-screenpad-control)|This repository contains a GUI utility for the brightness control on secondary screens ("ScreenPad Plus") on ASUS Zenbook Duo notebooks. This also includes the asus-wmi kernel module.||
+|GNOME extension: [Asus ZenBook Duo Integration](https://extensions.gnome.org/extension/4607/asus-zenbook-duo-integration/)|Integrate the features of the Asus ZenBook Duo into GNOME|This does *not* require the brightness file to be writable. It will prompt you to install a small helper script on first use|
+
+
+
 ### Troubleshooting
 On some kernels, it might happen that the built-in module overrides our compiled module.
 In this case, it might help to execute the following code afterwards:
