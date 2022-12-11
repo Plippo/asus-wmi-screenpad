@@ -4,8 +4,11 @@ VERSION=`uname -r | grep -o '^[0-9]\+\.[0-9]\+'`
 if { echo $VERSION ; echo "5.7" ; } | sort -V -c 2>/dev/null
 then
   PATCHFILE="patch"
-else
+elif { echo $VERSION ; echo "5.99" ; } | sort -V -c 2>/dev/null
+then
   PATCHFILE="patch5.8"
+else
+  PATCHFILE="patch6.0"
 fi
 
 echo "Using: $PATCHFILE"
