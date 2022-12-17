@@ -1,7 +1,7 @@
 diff -up orig/asus-nb-wmi.c new/asus-nb-wmi.c
---- orig/asus-nb-wmi.c	2022-12-11 17:17:28.000000000 +0100
-+++ new/asus-nb-wmi.c	2022-12-11 17:22:22.702726000 +0100
-@@ -545,6 +545,7 @@ static const struct key_entry asus_nb_wm
+--- orig/asus-nb-wmi.c	2022-12-13 22:35:04.000000000 +0100
++++ new/asus-nb-wmi.c	2022-12-13 21:45:58.005386623 +0100
+@@ -535,6 +535,7 @@ static const struct key_entry asus_nb_wm
  	{ KE_KEY, 0x65, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + TV */
  	{ KE_KEY, 0x66, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + TV */
  	{ KE_KEY, 0x67, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV */
@@ -9,7 +9,7 @@ diff -up orig/asus-nb-wmi.c new/asus-nb-wmi.c
  	{ KE_KEY, 0x6B, { KEY_TOUCHPAD_TOGGLE } },
  	{ KE_IGNORE, 0x6E, },  /* Low Battery notification */
  	{ KE_KEY, 0x71, { KEY_F13 } }, /* General-purpose button */
-@@ -554,6 +555,7 @@ static const struct key_entry asus_nb_wm
+@@ -544,6 +545,7 @@ static const struct key_entry asus_nb_wm
  	{ KE_KEY, 0x7D, { KEY_BLUETOOTH } }, /* Bluetooth Enable */
  	{ KE_KEY, 0x7E, { KEY_BLUETOOTH } }, /* Bluetooth Disable */
  	{ KE_KEY, 0x82, { KEY_CAMERA } },
@@ -17,7 +17,7 @@ diff -up orig/asus-nb-wmi.c new/asus-nb-wmi.c
  	{ KE_KEY, 0x86, { KEY_PROG1 } }, /* MyASUS Key */
  	{ KE_KEY, 0x88, { KEY_RFKILL  } }, /* Radio Toggle Key */
  	{ KE_KEY, 0x8A, { KEY_PROG1 } }, /* Color enhancement mode */
-@@ -567,6 +569,8 @@ static const struct key_entry asus_nb_wm
+@@ -557,6 +559,8 @@ static const struct key_entry asus_nb_wm
  	{ KE_KEY, 0x93, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV + DVI */
  	{ KE_KEY, 0x95, { KEY_MEDIA } },
  	{ KE_KEY, 0x99, { KEY_PHONE } }, /* Conflicts with fan mode switch */
@@ -27,8 +27,8 @@ diff -up orig/asus-nb-wmi.c new/asus-nb-wmi.c
  	{ KE_KEY, 0xA1, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + HDMI */
  	{ KE_KEY, 0xA2, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + HDMI */
 diff -up orig/asus-wmi.c new/asus-wmi.c
---- orig/asus-wmi.c	2022-12-11 17:17:28.000000000 +0100
-+++ new/asus-wmi.c	2022-12-11 17:22:22.706726000 +0100
+--- orig/asus-wmi.c	2022-12-13 22:35:03.000000000 +0100
++++ new/asus-wmi.c	2022-12-13 22:06:23.933950156 +0100
 @@ -29,6 +29,7 @@
  #include <linux/pci.h>
  #include <linux/pci_hotplug.h>
@@ -37,13 +37,14 @@ diff -up orig/asus-wmi.c new/asus-wmi.c
  #include <linux/platform_device.h>
  #include <linux/platform_profile.h>
  #include <linux/power_supply.h>
-@@ -208,11 +209,14 @@ struct asus_wmi {
+@@ -210,11 +211,15 @@ struct asus_wmi {
  	int kbd_led_wk;
  	struct led_classdev lightbar_led;
  	int lightbar_led_wk;
 +	struct led_classdev screenpad_led;
 +	int screenpad_led_wk;
  	struct led_classdev micmute_led;
++	struct led_classdev camera_led_on_keyboard;
  	struct workqueue_struct *led_workqueue;
  	struct work_struct tpd_led_work;
  	struct work_struct wlan_led_work;
@@ -52,10 +53,21 @@ diff -up orig/asus-wmi.c new/asus-wmi.c
  
  	struct asus_rfkill wlan;
  	struct asus_rfkill bluetooth;
-@@ -1039,6 +1043,75 @@ static int micmute_led_set(struct led_cl
+@@ -1146,6 +1151,85 @@ static int micmute_led_set(struct led_cl
  	return err < 0 ? err : 0;
  }
  
++static int camera_led_on_keyboard_set(struct led_classdev *led_cdev,
++				      enum led_brightness brightness)
++{
++	int state = brightness != LED_OFF;
++	int err;
++
++	err = asus_wmi_set_devstate(ASUS_WMI_DEVID_CAMERA_LED_ON_KEYBOARD,
++				state, NULL);
++	return err < 0 ? err : 0;
++}
++
 +static int screenpad_led_read(struct asus_wmi *asus, int *level)
 +{
 +	int value, retval;
@@ -124,22 +136,37 @@ diff -up orig/asus-wmi.c new/asus-wmi.c
 +	return value;
 +}
 +
-+
  static void asus_wmi_led_exit(struct asus_wmi *asus)
  {
  	led_classdev_unregister(&asus->kbd_led);
-@@ -1046,6 +1119,7 @@ static void asus_wmi_led_exit(struct asu
+@@ -1153,6 +1237,8 @@ static void asus_wmi_led_exit(struct asu
  	led_classdev_unregister(&asus->wlan_led);
  	led_classdev_unregister(&asus->lightbar_led);
  	led_classdev_unregister(&asus->micmute_led);
++	led_classdev_unregister(&asus->camera_led_on_keyboard);
 +	led_classdev_unregister(&asus->screenpad_led);
  
  	if (asus->led_workqueue)
  		destroy_workqueue(asus->led_workqueue);
-@@ -1130,6 +1204,20 @@ static int asus_wmi_led_init(struct asus
+@@ -1245,6 +1331,35 @@ static int asus_wmi_led_init(struct asus
  			goto error;
  	}
  
++	if (asus_wmi_dev_is_present(asus,
++			ASUS_WMI_DEVID_CAMERA_LED_ON_KEYBOARD)) {
++		asus->camera_led_on_keyboard.name = "platform::camera";
++		asus->camera_led_on_keyboard.max_brightness = 1;
++		asus->camera_led_on_keyboard.brightness_set_blocking =
++						camera_led_on_keyboard_set;
++		asus->camera_led_on_keyboard.default_trigger = "torch";
++
++		rv = led_classdev_register(&asus->platform_device->dev,
++						&asus->camera_led_on_keyboard);
++		if (rv)
++			goto error;
++	}
++
++
 +	if (asus_wmi_dev_is_present(asus, ASUS_WMI_DEVID_SCREENPAD)
 +		&& !screenpad_led_read(asus, &led_val)) {
 +		asus->screenpad_led_wk = led_val;
