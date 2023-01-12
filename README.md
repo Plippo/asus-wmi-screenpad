@@ -75,7 +75,12 @@ To install and use this module using dkms:
 
 
 
-### Troubleshooting
+## Troubleshooting
+
+### New kernel version
+If you keep updating your kernel for a while, it might happen that the downloaded and patched module no longer fits your kernel version and the dkms build fails. In this case, it often helps to clean and reinstall everything as described in the section **Removing or reinstalling** below.
+
+### Kernel module conflicts
 On some kernels, it might happen that the built-in module overrides our compiled module.
 In this case, it might help to execute the following code afterwards:
 ```bash
@@ -98,7 +103,7 @@ then rebuild as above.
 
 
 
-### Removing or reinstalling
+## Removing or reinstalling
 If you want to re-download and reinstall the kernel module (maybe because there have been changes in the code), you have to remove the old one first, calling
 ```
 sudo dkms remove -m asus-wmi -v 1.0 --all
@@ -106,5 +111,5 @@ sudo rm -r /usr/src/asus-wmi-1.0
 ```
 Then repeat the steps above from step 2 on.
 
-### Major kernel updates
-After a major kernel update (e.g. from 5.8 to 5.10), DKMS cannot update the module automatically as the new kernel sources need to be downloaded and patched. In this case, please uninstall and reinstall the module as described above under *Removing or reinstalling*.
+## Major kernel updates
+After a major kernel update (e.g. from 5.8 to 5.10), DKMS cannot update the module automatically as the new kernel sources need to be downloaded and patched. In this case, please uninstall and reinstall the module as described above in the section **Removing or reinstalling**.
