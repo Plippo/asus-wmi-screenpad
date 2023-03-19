@@ -1,16 +1,36 @@
+#!/bin/sh
+if [ "$(id -u)" -ne 0 ]; then echo "Please run using sudo."; exit 1; fi
+
+if [ -d /usr/src/asus-wmi-1.0 ] ; then
+        while true; do
+                read -p 'There seems to be a version installed already. Remove (recommended)? [Y/n] ' answer
+                case $answer in
+                        [Yy]* )
+                                echo "Removing old version..."
+                                dkms remove -m asus-wmi -v 1.0 --all
+                                rm -r /usr/src/asus-wmi-1.0
+                                break;;
+                        [Nn]* ) break;;
+                        * ) echo "Please enter either y or n.";;
+                esac
+        done
+fi
+
+echo "Installing current version..."
+
 #downloading zip and unpacking it
-sudo mkdir /usr/src/asus-wmi-1.0
+mkdir /usr/src/asus-wmi-1.0
 cd /usr/src/asus-wmi-1.0
-sudo wget 'https://github.com/Plippo/asus-wmi-screenpad/archive/master.zip'
-sudo unzip master.zip
-sudo mv asus-wmi-screenpad-master/* .
-sudo rmdir asus-wmi-screenpad-master
-sudo rm master.zip
+wget 'https://github.com/Plippo/asus-wmi-screenpad/archive/master.zip'
+unzip master.zip
+mv asus-wmi-screenpad-master/* .
+rmdir asus-wmi-screenpad-master
+rm master.zip
 
 # preparing for current kernel
-sudo sh prepare-for-current-kernel.sh
+sh prepare-for-current-kernel.sh
 
 #registering with dkms and installing
-sudo dkms add -m asus-wmi -v 1.0
-sudo dkms build -m asus-wmi -v 1.0
-sudo dkms install -m asus-wmi -v 1.0
+dkms add -m asus-wmi -v 1.0
+dkms build -m asus-wmi -v 1.0
+dkms install -m asus-wmi -v 1.0
