@@ -10,6 +10,13 @@ To install and use this module using dkms:
    In addition to that, you need to have the headers for your current kernels installed. Most distributions provide a package for that.
    E.g. Ubuntu: `sudo apt install linux-headers-5.4.0-37` (replace by the correct version as determined by `uname -r`)
 
+2. To install, or reinstall, the module 
+   ```sudo sh install.sh```
+   if a patch is needed add `-p` option
+   ```sudo sh install.sh -p```
+
+### Alternatively follow the steps below
+
 2. Create a directory for the module and download the source code
    ```
    sudo mkdir /usr/src/asus-wmi-1.0
