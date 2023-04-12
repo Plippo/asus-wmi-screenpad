@@ -670,7 +670,7 @@ static int screenpad_led_read(struct asus_wmi *asus, int *level)
 {
 	int value, retval;
 	retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD, &value);
-	if (retval == 0 && (value & 0x1) == 0x1)
+	if (retval == 0 && (value & 0x21) != 0)
 	{
 		// screen is activated, so read backlight
 		retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD_LIGHT, &value);
