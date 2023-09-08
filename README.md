@@ -96,7 +96,7 @@ on newer Ubuntu versions it can happen that the `mfd_aaeon` kernel module is int
 it is only needed for asus embedded boards - more details in [#issues/32](https://github.com/Plippo/asus-wmi-screenpad/issues/32#issuecomment-986424835)
 so we can safely blacklist:
 ```bash
-echo "blacklist mdf_aaeon" | sudo tee /etc/modprobe.d/aaeon-blacklist.conf
+echo "blacklist mfd_aaeon" | sudo tee /etc/modprobe.d/aaeon-blacklist.conf
 sudo update-initramfs -k all -u
 ```
 then rebuild as above.
