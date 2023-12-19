@@ -91,6 +91,15 @@ sudo ln -s ../../../../extra/asus-nb-wmi.ko ./
 sudo ln -s ../../../../extra/asus-wmi.ko ./
 sudo depmod -a
 ```
+For some newer system(EG:linuxmint 22 with kernel 6.2),it might help to execute the following code afterwards:
+```bash
+cd /lib/modules/YOURKERNELVERSION/kernel/drivers/platform/x86
+sudo mv asus-nb-wmi.ko asus-nb-wmi.ko_bak
+sudo mv asus-wmi.ko asus-wmi.ko_bak
+sudo ln -s ../../../../updates/dkms/asus-nb-wmi.ko ./
+sudo ln -s ../../../../updates/dkms/asus-wmi.ko ./
+sudo depmod -a
+```
 
 on newer Ubuntu versions it can happen that the `mfd_aaeon` kernel module is interfering.
 it is only needed for asus embedded boards - more details in [#issues/32](https://github.com/Plippo/asus-wmi-screenpad/issues/32#issuecomment-986424835)
