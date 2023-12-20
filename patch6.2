@@ -1,0 +1,148 @@
+--- orig/asus-nb-wmi.c	2023-12-19 14:13:54.272047000 +0800
++++ new/asus-nb-wmi.c	2023-12-19 14:43:24.278773428 +0800
+@@ -550,6 +550,7 @@ static const struct key_entry asus_nb_wm
+ 	{ KE_KEY, 0x65, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + TV */
+ 	{ KE_KEY, 0x66, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + TV */
+ 	{ KE_KEY, 0x67, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV */
++    { KE_KEY, 0x6A, { KEY_F16 } }, /* Toggle ScreenPad key */
+ 	{ KE_KEY, 0x6B, { KEY_TOUCHPAD_TOGGLE } },
+ 	{ KE_IGNORE, 0x6E, },  /* Low Battery notification */
+ 	{ KE_KEY, 0x71, { KEY_F13 } }, /* General-purpose button */
+@@ -573,6 +574,8 @@ static const struct key_entry asus_nb_wm
+ 	{ KE_KEY, 0x93, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV + DVI */
+ 	{ KE_KEY, 0x95, { KEY_MEDIA } },
+ 	{ KE_KEY, 0x99, { KEY_PHONE } }, /* Conflicts with fan mode switch */
++	{ KE_KEY, 0x9C, { KEY_F15 } }, /* Zenbook Duo Swap Windows */
++	{ KE_KEY, 0x9D, { KEY_F14 } }, /* Zenbook Duo Power mode */
+ 	{ KE_KEY, 0xA0, { KEY_SWITCHVIDEOMODE } }, /* SDSP HDMI only */
+ 	{ KE_KEY, 0xA1, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + HDMI */
+ 	{ KE_KEY, 0xA2, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + HDMI */
+--- orig/asus-wmi.c	2023-12-19 14:13:41.836019000 +0800
++++ new/asus-wmi.c	2023-12-19 14:33:05.597363735 +0800
+@@ -29,6 +29,7 @@
+ #include <linux/pci.h>
+ #include <linux/pci_hotplug.h>
+ #include <linux/platform_data/x86/asus-wmi.h>
++#include "inc/asus-wmi.h"
+ #include <linux/platform_device.h>
+ #include <linux/platform_profile.h>
+ #include <linux/power_supply.h>
+@@ -210,11 +211,14 @@ struct asus_wmi {
+ 	int kbd_led_wk;
+ 	struct led_classdev lightbar_led;
+ 	int lightbar_led_wk;
++	struct led_classdev screenpad_led;
++	int screenpad_led_wk;
+ 	struct led_classdev micmute_led;
+ 	struct workqueue_struct *led_workqueue;
+ 	struct work_struct tpd_led_work;
+ 	struct work_struct wlan_led_work;
+ 	struct work_struct lightbar_led_work;
++    struct work_struct screenpad_led_work;
+ 
+ 	struct asus_rfkill wlan;
+ 	struct asus_rfkill bluetooth;
+@@ -1153,6 +1157,74 @@ static int micmute_led_set(struct led_cl
+ 	return err < 0 ? err : 0;
+ }
+ 
++static int screenpad_led_read(struct asus_wmi *asus, int *level)
++{
++	int value, retval;
++	retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD, &value);
++	if (retval == 0 && (value & 0x21) != 0)
++	{
++		// screen is activated, so read backlight
++		retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD_LIGHT, &value);
++		if (retval == 0)
++		{
++			*level = value & ASUS_WMI_DSTS_BRIGHTNESS_MASK;
++		}
++	}
++	else
++	{
++		*level = 0;
++	}
++
++	if (retval < 0)
++		return retval;
++	return 0;
++}
++
++static void screenpad_led_update(struct work_struct *work)
++{
++	struct asus_wmi *asus;
++	int ctrl_param;
++
++	asus = container_of(work, struct asus_wmi, screenpad_led_work);
++
++	ctrl_param = asus->screenpad_led_wk;
++	if (ctrl_param == 0x00)
++	{
++		// turn off screen
++		asus_wmi_set_devstate(ASUS_WMI_DEVID_SCREENPAD, ctrl_param, NULL);
++	}
++	else
++	{
++		// set backlight (also turns on screen if is off)
++		asus_wmi_set_devstate(ASUS_WMI_DEVID_SCREENPAD_LIGHT, ctrl_param, NULL);
++	}
++}
++
++static void screenpad_led_set(struct led_classdev *led_cdev,
++			     enum led_brightness value)
++{
++	struct asus_wmi *asus;
++
++	asus = container_of(led_cdev, struct asus_wmi, screenpad_led);
++
++	asus->screenpad_led_wk = value;
++	queue_work(asus->led_workqueue, &asus->screenpad_led_work);
++}
++
++static enum led_brightness screenpad_led_get(struct led_classdev *led_cdev)
++{
++	struct asus_wmi *asus;
++	int retval, value;
++
++	asus = container_of(led_cdev, struct asus_wmi, screenpad_led);
++
++	retval = screenpad_led_read(asus, &value);
++	if (retval < 0)
++		return retval;
++
++	return value;
++}
++
+ static void asus_wmi_led_exit(struct asus_wmi *asus)
+ {
+ 	led_classdev_unregister(&asus->kbd_led);
+@@ -1160,6 +1232,7 @@ static void asus_wmi_led_exit(struct asu
+ 	led_classdev_unregister(&asus->wlan_led);
+ 	led_classdev_unregister(&asus->lightbar_led);
+ 	led_classdev_unregister(&asus->micmute_led);
++    led_classdev_unregister(&asus->screenpad_led);
+ 
+ 	if (asus->led_workqueue)
+ 		destroy_workqueue(asus->led_workqueue);
+@@ -1252,6 +1325,20 @@ static int asus_wmi_led_init(struct asus
+ 			goto error;
+ 	}
+ 
++	if (asus_wmi_dev_is_present(asus, ASUS_WMI_DEVID_SCREENPAD)
++		&& !screenpad_led_read(asus, &led_val)) {
++		asus->screenpad_led_wk = led_val;
++		INIT_WORK(&asus->screenpad_led_work, screenpad_led_update);
++
++		asus->screenpad_led.name = "asus::screenpad";
++		asus->screenpad_led.brightness_set = screenpad_led_set;
++		asus->screenpad_led.brightness_get = screenpad_led_get;
++		asus->screenpad_led.max_brightness = 0xff;
++
++		rv = led_classdev_register(&asus->platform_device->dev,
++					   &asus->screenpad_led);
++	}
++
+ error:
+ 	if (rv)
+ 		asus_wmi_led_exit(asus);
