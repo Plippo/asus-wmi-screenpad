@@ -7,7 +7,7 @@ then
 elif { echo $VERSION ; echo "5.99" ; } | sort -V -c 2>/dev/null
 then
   PATCHFILE="patch5.8"
-elif { echo $VERSION ; echo "6.0" ; } | sort -V -c 2>/dev/null
+elif { echo $VERSION ; echo "6.19" ; } | sort -V -c 2>/dev/null
 then
   PATCHFILE="patch6.0"
 else
