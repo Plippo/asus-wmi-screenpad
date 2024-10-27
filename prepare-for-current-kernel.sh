@@ -7,14 +7,17 @@ then
 elif { echo $VERSION ; echo "5.99" ; } | sort -V -c 2>/dev/null
 then
   PATCHFILE="patch5.8"
-elif { echo $VERSION ; echo "6.19" ; } | sort -V -c 2>/dev/null
+elif { echo $VERSION ; echo "6.1" ; } | sort -V -c 2>/dev/null
 then
   PATCHFILE="patch6.0"
-else
+elif { echo $VERSION ; echo "6.10" ; } | sort -V -c 2>/dev/null
+then
   PATCHFILE="patch6.2"
+else
+  PATCHFILE="patch6.11"
 fi
 
-echo "Using: $PATCHFILE"
+echo "Using: $PATCHFILE - version: $VERSION"
 
 wget "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/drivers/platform/x86/asus-wmi.c?h=linux-$VERSION.y" -O 'asus-wmi.c'
 wget "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/drivers/platform/x86/asus-wmi.h?h=linux-$VERSION.y" -O 'asus-wmi.h'
