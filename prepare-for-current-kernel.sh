@@ -13,8 +13,11 @@ then
 elif { echo $VERSION ; echo "6.10" ; } | sort -V -c 2>/dev/null
 then
   PATCHFILE="patch6.2"
-else
+elif { echo $VERSION ; echo "6.16" ; } | sort -V -c 2>/dev/null
+then
   PATCHFILE="patch6.11"
+else
+  PATCHFILE="patch6.17"
 fi
 
 echo "Using: $PATCHFILE - version: $VERSION"
