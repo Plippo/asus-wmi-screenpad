@@ -60,7 +60,7 @@ diff --color -up orig/asus-wmi.c new/asus-wmi.c
 +static int screenpad_led_read(struct asus_wmi *asus, int *level)
 +{
 +	int value, retval;
-+	retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD, &value);
++	retval = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_SCREENPAD_POWER, &value);
 +	if (retval == 0 && (value & 0x21) != 0)
 +	{
 +		// screen is activated, so read backlight
@@ -91,7 +91,7 @@ diff --color -up orig/asus-wmi.c new/asus-wmi.c
 +	if (ctrl_param == 0x00)
 +	{
 +		// turn off screen
-+		asus_wmi_set_devstate(ASUS_WMI_DEVID_SCREENPAD, ctrl_param, NULL);
++		asus_wmi_set_devstate(ASUS_WMI_DEVID_SCREENPAD_POWER, ctrl_param, NULL);
 +	}
 +	else
 +	{
@@ -140,7 +140,7 @@ diff --color -up orig/asus-wmi.c new/asus-wmi.c
  					   &asus->lightbar_led);
  	}
 +	
-+	if (asus_wmi_dev_is_present(asus, ASUS_WMI_DEVID_SCREENPAD)
++	if (asus_wmi_dev_is_present(asus, ASUS_WMI_DEVID_SCREENPAD_POWER)
 +		&& !screenpad_led_read(asus, &led_val)) {
 +		asus->screenpad_led_wk = led_val;
 +		INIT_WORK(&asus->screenpad_led_work, screenpad_led_update);
