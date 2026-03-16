@@ -29,4 +29,4 @@ wget "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/dri
 wget "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/drivers/platform/x86/asus-wmi.h?h=linux-$VERSION.y" -O 'asus-wmi.h'
 wget "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/drivers/platform/x86/asus-nb-wmi.c?h=linux-$VERSION.y" -O 'asus-nb-wmi.c'
 patch -p1 < $PATCHFILE
-rm *.orig
+find . -maxdepth 1 -iname '*.orig' -delete
